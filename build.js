@@ -50,6 +50,10 @@ const manifest = manifests.reduce((acc, cur) => ({ ...acc, ...cur }), {});
 // write to file
 await writeFile('./dist/manifest.json', JSON.stringify(manifest, null, 2))
 
+// Delete the Manifest files
+await rm("./dist/css/manifest.json", { force: true });
+await rm("./dist/js/manifest.json", { force: true });
+
 // Issue: About 1 in 15 times, this doesn't return the correct amount of files.
 const files = await getFiles("./dist");
-console.log(`Generated ${files.length} files`);
+console.log(`Generated ${files.length} files from ${assetTags.length} tags`);
