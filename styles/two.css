@@ -1,0 +1,10 @@
+.thing {
+  --size: 20px;
+  width: var(--size);
+  height: var(--size);
+  padding: calc(var(--size) / 2);
+}
+
+body {
+  background: url('../images/wes.jpg');
+}
