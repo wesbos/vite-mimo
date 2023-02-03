@@ -1,8 +1,9 @@
 import { build } from "vite";
+import pAll from "p-all";
 import { parse } from "node-html-parser";
-import { readdir, readFile, rm, writeFile } from "fs/promises";
-import path, { resolve } from "path";
-import { getFiles } from './utils.js';
+import { readFile, rm, writeFile } from "fs/promises";
+import path from "path";
+import { getFiles, wait } from './utils.js';
 
 // Get the HTML of our one entry
 const index = await readFile("./index.html", "utf8");
@@ -13,37 +14,41 @@ const assetTags = root.querySelectorAll('link[rel="stylesheet"], script[type="mo
 // Empty the dist folder
 await rm("./dist", { recursive: true, force: true });
 
-const thePromiseLand = assetTags.map(async (tag) => {
-  const src = tag.getAttribute("href") || tag.getAttribute("src");
-  const fileExtension = path.extname(src);
-  const fileName = path.basename(src, fileExtension);
-  const built = await build({
-    configFile: false,
-    clearScreen: false,
-    emptyOutDir: false,
-    build: {
-      manifest: true,
-      rollupOptions: {
-        input: src,
 
-        output: {
-          dir: `dist/${tag.tagName === 'LINK' ? 'css' : 'js'}`,
-          // name it here. Vite has a fileName option, but it only does .js
-          assetFileNames: `[name].[hash].[ext]`,
-          entryFileNames: `[name].[hash].js`,
+const thePromiseLand = assetTags.map(async (tag) => {
+  return async function() {
+    await wait(2000); // slow it down to see whats going on
+    const src = tag.getAttribute("href") || tag.getAttribute("src");
+    const fileExtension = path.extname(src);
+    const fileName = path.basename(src, fileExtension);
+    const built = await build({
+      configFile: false,
+      clearScreen: false,
+      emptyOutDir: false,
+      build: {
+        manifest: true,
+        rollupOptions: {
+          input: src,
+          output: {
+            dir: `dist/${tag.tagName === "LINK" ? "css" : "js"}`,
+            // name it here. Vite has a fileName option, but it only does .js
+            assetFileNames: `[name].[hash].[ext]`,
+            entryFileNames: `[name].[hash].js`,
+          },
         },
       },
-    },
-  });
+    });
 
-  // Find and return the manifest
-  const manifest = built.output.find(
-    (o) => o.type === "asset" && o.fileName.includes("manifest.json")
-  );
-  return JSON.parse(manifest.source);
-});
+    // Find and return the manifest
+    const manifest = built.output.find(
+      (o) => o.type === "asset" && o.fileName.includes("manifest.json")
+    );
+    return JSON.parse(manifest.source);
+  }
+})
 
-const manifests = await Promise.all(thePromiseLand);
+const manifests = await pAll(thePromiseLand, { concurrency: 1 });
+// const manifests = await Promise.all(thePromiseLand);
 // merge all the manifests into one
 const manifest = manifests.reduce((acc, cur) => ({ ...acc, ...cur }), {});
 
