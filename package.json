@@ -1,7 +1,7 @@
 {
   "name": "vite-mimo",
   "version": "1.0.0",
-  "description": "an example on how to get Vite to work with multiple ins, multple outs. useful for traditional server rendered with multiple inputs",
+  "description": "an example on how to get Vite to work with multiple ins, multple outs.",
   "main": "index.js",
   "type": "module",
   "scripts": {

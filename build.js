@@ -9,11 +9,11 @@ const index = await readFile("./index.html", "utf8");
 // parse it into a DOM tree
 const root = parse(index);
 // get all the link tags
-const linkTags = root.querySelectorAll('link[rel="stylesheet"], script[type="module"]');
+const assetTags = root.querySelectorAll('link[rel="stylesheet"], script[type="module"]');
 // Empty the dist folder
 await rm("./dist", { recursive: true, force: true });
 
-const thePromiseLand = linkTags.map(async (tag) => {
+const thePromiseLand = assetTags.map(async (tag) => {
   const src = tag.getAttribute("href") || tag.getAttribute("src");
   const fileExtension = path.extname(src);
   const fileName = path.basename(src, fileExtension);
