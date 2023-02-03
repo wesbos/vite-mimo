@@ -50,7 +50,7 @@ const manifest = manifests.reduce((acc, cur) => ({ ...acc, ...cur }), {});
 // write to file
 await writeFile('./dist/manifest.json', JSON.stringify(manifest, null, 2))
 
-// Delete the Manifest files
+// Delete the Manifest files from each sub-dir because we merged them into one
 await rm("./dist/css/manifest.json", { force: true });
 await rm("./dist/js/manifest.json", { force: true });
 
