@@ -1,6 +1,6 @@
 ## Vite Mimo
 
-Vite with mulitple CSS and JS files
+Vite with multiple CSS and JS files
 
 This is an exploration on how to get Vite to work with multiple inputs and multiple outputs.
 
@@ -40,14 +40,4 @@ The Running `vite` will spin up the dev server. You then will need to manually i
 
 ## Building
 
-The `build.js` script will crawl your `index.html` for all scripts and stylesheets and then run the build command against each of them.
-
-Once all have finished, it will merge all the manifest outputs into a single `manifest.json`.
-
-## Issues
-
-Currently when I run `node build.js` multiple times, every 6-7 times some of the images and CSS files do not get output into the folder.
-
-Not sure if this is a race condition - it shouldn't be as I'm using promises for everything.
-
-Still investigating...
+The `build.js` script will crawl your `index.html` for all scripts and stylesheets and then pass each of those to the rollup config via the [input](https://rollupjs.org/configuration-options/#input) option.
